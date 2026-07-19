@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wash & Care | เช็กสถานะผ้า</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Prompt', 'sans-serif'] },
+                    colors: {
+                        primary: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 900: '#0c4a6e' },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .bg-wave {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            border-bottom-left-radius: 2.5rem;
+            border-bottom-right-radius: 2.5rem;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- หน้า 1: ค้นหาด้วยเบอร์โทร (Login Screen) -->
+    <div id="view-login" class="flex-1 flex flex-col items-center justify-center p-6 bg-gradient-to-br from-primary-50 to-slate-100">
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 text-center border border-slate-100 relative overflow-hidden">
+            <!-- Decoration -->
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-primary-100 rounded-full mix-blend-multiply filter blur-xl opacity-70"></div>
+            <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70"></div>
+            
+            <div class="relative z-10">
+                <div class="w-20 h-20 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner text-primary-500 text-4xl">
+                    <i class="fa-solid fa-shirt"></i>
+                </div>
+                
+                <h1 class="text-2xl font-bold text-slate-800 mb-2">Wash & Care</h1>
+                <p class="text-slate-500 text-sm mb-8">ยินดีต้อนรับ! กรุณากรอกเบอร์โทรศัพท์<br>เพื่อเช็กสถานะผ้าและแต้มสะสมของคุณ</p>
+                
+                <div class="relative mb-6">
+                    <i class="fa-solid fa-phone absolute left-4 top-4 text-slate-400"></i>
+                    <input type="tel" id="login-phone" placeholder="เบอร์โทรศัพท์ 10 หลัก" class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none font-medium text-lg text-center tracking-wider">
+                </div>
+                
+                <button onclick="checkStatus()" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-primary-500/30 transition-all text-lg flex items-center justify-center group">
+                    เข้าสู่ระบบ / ตรวจสอบ
+                    <i class="fa-solid fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </div>
+        </div>
+        <p class="text-xs text-slate-400 mt-8">© 2026 Wash & Care Laundry Service</p>
+    </div>
+
+    <!-- หน้า 2: แดชบอร์ดลูกค้า (Customer Portal) -->
+    <div id="view-dashboard" class="hidden flex-col min-h-screen">
+        
+        <!-- Header Profile -->
+        <div class="bg-wave text-white pt-8 pb-12 px-6 shadow-md relative z-10">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-lg font-bold tracking-wide"><i class="fa-solid fa-shirt mr-2"></i>Wash&Care</h1>
+                <button onclick="logout()" class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center backdrop-blur-sm transition">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 bg-white/20 p-1 rounded-full backdrop-blur-sm">
+                    <img src="https://ui-avatars.com/api/?name=User&background=fff&color=0ea5e9" id="user-avatar" class="w-full h-full rounded-full">
+                </div>
+                <div>
+                    <p class="text-primary-100 text-sm font-medium">สวัสดีครับ/ค่ะ,</p>
+                    <h2 class="text-2xl font-bold" id="dash-name">คุณลูกค้า</h2>
+                    <p class="text-sm mt-1 bg-white/20 inline-block px-3 py-1 rounded-full backdrop-blur-sm">
+                        <i class="fa-solid fa-star text-yellow-300 mr-1"></i> แต้มสะสม <span id="dash-points" class="font-bold">0</span> คะแนน
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content (Overlapping Header) -->
+        <div class="flex-1 px-4 sm:px-6 -mt-6 relative z-20 pb-10 max-w-2xl mx-auto w-full">
+            
+            <!-- Alert ค้างชำระ (ถ้ามี) -->
+            <div id="unpaid-alert" class="hidden bg-red-50 border border-red-100 p-4 rounded-2xl shadow-sm mb-6 flex items-start gap-3">
+                <div class="w-10 h-10 bg-red-100 text-red-500 rounded-full flex items-center justify-center flex-shrink-0 text-xl"><i class="fa-solid fa-circle-exclamation"></i></div>
+                <div>
+                    <h3 class="font-bold text-red-700">มียอดค้างชำระ</h3>
+                    <p class="text-sm text-red-600 mt-1">กรุณาเตรียมเงินสดหรือแอปธนาคารสำหรับชำระค่าบริการ ยอดรวม <span id="unpaid-amount" class="font-bold text-lg">0</span> บาท ในวันรับผ้า</p>
+                </div>
+            </div>
+
+            <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center"><i class="fa-solid fa-box-open text-primary-500 mr-2"></i>ออเดอร์ปัจจุบันของคุณ</h3>
+            
+            <!-- รายการออเดอร์ -->
+            <div id="active-orders" class="space-y-4">
+                <!-- JS Injected -->
+            </div>
+
+            <!-- ว่างเปล่า -->
+            <div id="empty-state" class="hidden bg-white p-8 rounded-3xl shadow-sm border border-slate-100 text-center">
+                <div class="w-20 h-20 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl"><i class="fa-solid fa-basket-shopping"></i></div>
+                <h3 class="font-bold text-slate-700 mb-1">ไม่มีออเดอร์ที่กำลังดำเนินการ</h3>
+                <p class="text-sm text-slate-500">นำผ้ามาซักกับเราสิครับ! เราพร้อมให้บริการเสมอ</p>
+            </div>
+
+            <div class="mt-8">
+                <h3 class="font-bold text-slate-800 text-lg mb-4">ประวัติการซักล่าสุด</h3>
+                <div id="history-orders" class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-50">
+                    <!-- JS Injected -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        // --- 1. FIREBASE SETUP & IMPORTS ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, onSnapshot, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAuzuhOIFXN9iGNrJfkehblVZPsi3VhmHo",
+            authDomain: "washdry-fa261.firebaseapp.com",
+            projectId: "washdry-fa261",
+            storageBucket: "washdry-fa261.firebasestorage.app",
+            messagingSenderId: "450128339566",
+            appId: "1:450128339566:web:9315bfa0e4899b49da7c7f",
+            measurementId: "G-6DVWKQ9X33"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const dbStore = getFirestore(app);
+
+        let currentUserPhone = '';
+        let unsubscribeOrders = null; // เก็บฟังก์ชันสำหรับยกเลิก Real-time sync
+
+        // --- 2. AUTH & FETCH DATA ---
+        async function checkStatus() {
+            const phone = document.getElementById('login-phone').value.trim();
+            if (phone.length < 9) { alert("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง"); return; }
+
+            const btn = document.querySelector('button[onclick="checkStatus()"]');
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> กำลังตรวจสอบ...`; btn.disabled = true;
+
+            try {
+                // ดึงข้อมูลลูกค้า
+                const custRef = doc(dbStore, "customers", phone);
+                const custSnap = await getDoc(custRef);
+                
+                // ดึงออเดอร์ทั้งหมดของเบอร์นี้เพื่อเช็กว่าเคยมีประวัติไหม
+                const q = query(collection(dbStore, "orders"), where("phone", "==", phone));
+                const querySnapshot = await getDocs(q);
+
+                btn.innerHTML = `เข้าสู่ระบบ / ตรวจสอบ <i class="fa-solid fa-arrow-right ml-2"></i>`; btn.disabled = false;
+
+                if (!custSnap.exists() && querySnapshot.empty) {
+                    alert("ไม่พบข้อมูลลูกค้ารายนี้ หรือยังไม่มีรายการซักในระบบครับ");
+                    logout(); return;
+                }
+
+                currentUserPhone = phone;
+                document.getElementById('view-login').classList.add('hidden');
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                document.getElementById('view-dashboard').classList.add('flex');
+                
+                let customerData = custSnap.exists() ? custSnap.data() : null;
+
+                // สร้าง Real-time Listener ฟังออเดอร์ของลูกค้ารายนี้ (อัปเดตสดๆ ไม่ง้อการรีเฟรชหน้า!)
+                unsubscribeOrders = onSnapshot(q, (snapshot) => {
+                    const myOrders = snapshot.docs.map(doc => doc.data()).sort((a,b) => new Date(b.date) - new Date(a.date));
+                    renderDashboard(customerData, myOrders);
+                });
+
+            } catch (error) {
+                console.error("Error accessing Firebase: ", error);
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล");
+                btn.innerHTML = `เข้าสู่ระบบ / ตรวจสอบ <i class="fa-solid fa-arrow-right ml-2"></i>`; btn.disabled = false;
+            }
+        }
+
+        function logout() {
+            currentUserPhone = '';
+            if (unsubscribeOrders) { unsubscribeOrders(); unsubscribeOrders = null; } // ยกเลิกการซิงค์
+            document.getElementById('login-phone').value = '';
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-dashboard').classList.remove('flex');
+            document.getElementById('view-login').classList.remove('hidden');
+        }
+
+        // --- 3. UI RENDERING ---
+        function renderDashboard(customer, myOrders) {
+            let name = customer ? customer.name : (myOrders[0]?.name || 'ลูกค้าทั่วไป');
+            let points = customer ? customer.points : 0;
+
+            document.getElementById('dash-name').innerText = name;
+            document.getElementById('dash-points').innerText = points;
+            document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=fff&color=0ea5e9`;
+
+            const active = myOrders.filter(o => o.status !== 'completed');
+            const history = myOrders.filter(o => o.status === 'completed').slice(0, 5);
+
+            const unpaidOrders = active.filter(o => !o.isPaid);
+            const alertBox = document.getElementById('unpaid-alert');
+            if (unpaidOrders.length > 0) {
+                document.getElementById('unpaid-amount').innerText = unpaidOrders.reduce((sum, o) => sum + o.total, 0).toLocaleString();
+                alertBox.classList.remove('hidden');
+            } else { alertBox.classList.add('hidden'); }
+
+            const activeContainer = document.getElementById('active-orders');
+            const emptyState = document.getElementById('empty-state');
+            activeContainer.innerHTML = '';
+            if (active.length === 0) { emptyState.classList.remove('hidden'); } 
+            else { emptyState.classList.add('hidden'); active.forEach(order => activeContainer.innerHTML += createActiveOrderCard(order)); }
+
+            const historyContainer = document.getElementById('history-orders');
+            if (history.length === 0) { historyContainer.innerHTML = `<div class="p-4 text-center text-slate-400 text-sm">ยังไม่มีประวัติการซักที่เสร็จสิ้น</div>`; } 
+            else {
+                historyContainer.innerHTML = history.map(o => `
+                    <div class="p-4 flex justify-between items-center">
+                        <div><p class="font-bold text-slate-700 text-sm">${o.serviceName}</p><p class="text-xs text-slate-400">${new Date(o.date).toLocaleDateString('th-TH')}</p></div>
+                        <div class="text-right"><p class="font-bold text-slate-800 text-sm">฿${o.total}</p><span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">รับผ้าแล้ว</span></div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function createActiveOrderCard(order) {
+            const stages = ['pending', 'processing', 'ready'];
+            const currentStageIndex = stages.indexOf(order.status);
+            
+            const timelineHTML = stages.map((stage, index) => {
+                let icon = stage==='pending'?'fa-inbox' : stage==='processing'?'fa-jug-detergent' : 'fa-check-double';
+                let label = stage==='pending'?'รับผ้าแล้ว' : stage==='processing'?'กำลังซัก/รีด' : 'พร้อมส่งมอบ';
+                let state = (index < currentStageIndex) ? 'bg-primary-500 text-white' : 
+                            (index === currentStageIndex) ? (stage === 'ready' ? 'bg-green-500 text-white ring-4 ring-green-100 animate-pulse' : 'bg-primary-500 text-white ring-4 ring-primary-100') : 'bg-slate-100 text-slate-400';
+                return `<div class="flex flex-col items-center relative z-10 w-1/3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center mb-2 shadow-sm ${state}"><i class="fa-solid ${icon} text-sm"></i></div>
+                            <span class="text-[10px] font-medium text-center ${index <= currentStageIndex ? 'text-slate-800' : 'text-slate-400'}">${label}</span>
+                        </div>`;
+            }).join('');
+
+            const progressPercentage = currentStageIndex === 0 ? 0 : (currentStageIndex === 1 ? 50 : 100);
+            const progressColor = order.status === 'ready' ? 'bg-green-500' : 'bg-primary-500';
+            const badgePay = order.isPaid ? `<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-md font-bold"><i class="fa-solid fa-check mr-1"></i> จ่ายแล้ว</span>` : `<span class="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-md font-bold">ค้างชำระ ฿${order.total}</span>`;
+            
+            let readyAlert = order.status === 'ready' ? `
+                <div class="mt-4 p-3 bg-green-50 rounded-xl border border-green-200 flex items-center gap-3">
+                    <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-bell"></i></div>
+                    <div><p class="text-sm font-bold text-green-800">ผ้าของคุณพร้อมรับแล้ว!</p><p class="text-xs text-green-700 mt-0.5">แจ้งพนักงานว่ามารับออเดอร์ ${order.id} (เก็บที่: ${order.rack})</p></div>
+                </div>` : '';
+
+            return `
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 relative overflow-hidden mb-4">
+                    <div class="flex justify-between items-start mb-6">
+                        <div><p class="text-xs text-slate-400 mb-1">Order ID: <span class="font-mono text-slate-600">${order.id}</span></p><h3 class="font-bold text-slate-800 text-lg">${order.serviceName}</h3><p class="text-sm text-slate-500">จำนวน: ${order.qty}</p></div>
+                        <div class="text-right">${badgePay}</div>
+                    </div>
+                    <div class="relative mt-6 pt-2">
+                        <div class="absolute top-7 left-[16%] right-[16%] h-1 bg-slate-100 rounded-full z-0"></div>
+                        <div class="absolute top-7 left-[16%] h-1 rounded-full z-0 transition-all duration-1000 ${progressColor}" style="width: calc(${progressPercentage}% * 0.68);"></div>
+                        <div class="flex justify-between relative z-10">${timelineHTML}</div>
+                    </div>
+                    ${readyAlert}
+                </div>`;
+        }
+
+        // Expose to window for UI buttons
+        window.checkStatus = checkStatus; window.logout = logout;
+    </script>
+</body>
+</html>

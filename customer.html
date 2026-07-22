@@ -1,342 +1,302 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wash & Care | แอปพลิเคชันลูกค้า</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Prompt', 'sans-serif'] },
-                    colors: { primary: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1' }, gold: { 400: '#fbbf24', 500: '#f59e0b' }, silver: { 400: '#94a3b8', 500: '#64748b' } }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Prompt', sans-serif; background-color: #f1f5f9; -webkit-tap-highlight-color: transparent; }
-        .hide-scroll::-webkit-scrollbar { display: none; }
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-top: 1px solid rgba(226, 232, 240, 0.8); }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>สั่งอาหาร</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <style>
+    :root {
+      --primary-color: #00B900;
+      --primary-light: #e6f7e6;
+      --bg-color: #f8f9fa;
+      --text-dark: #212121;
+      --text-light: #757575;
+      --white: #ffffff;
+      --warning: #ff9800;
+      --danger: #f44336;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Prompt', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-dark);
+      padding-bottom: 80px;
+    }
+
+    /* ---------------- หน้าแรก (Home Screen) ---------------- */
+    #home-screen { display: block; }
+    
+    .header {
+      background-color: var(--white);
+      padding: 15px 20px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .location-box { display: flex; align-items: center; gap: 8px; }
+    .location-box .pin { color: var(--danger); font-size: 24px; }
+    .location-text { display: flex; flex-direction: column; }
+    .location-text span:first-child { font-size: 12px; color: var(--text-light); }
+    .location-text span:last-child { font-size: 15px; font-weight: 600; display: flex; align-items: center; }
+    
+    .search-section { background-color: var(--white); padding: 5px 20px 15px; }
+    .search-bar { background-color: var(--bg-color); border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; gap: 10px; }
+    .search-bar input { border: none; background: transparent; width: 100%; font-family: 'Prompt', sans-serif; outline: none; }
+
+    .banner-section { padding: 15px 20px; }
+    .banner { width: 100%; height: 120px; background: linear-gradient(135deg, #00B900, #4caf50); border-radius: 12px; display: flex; align-items: center; padding: 20px; color: var(--white); position: relative; overflow: hidden; }
+    .banner h3 { margin: 0; font-size: 20px; z-index: 2; }
+    .banner p { margin: 5px 0 0; font-size: 13px; z-index: 2; }
+
+    .categories { display: flex; overflow-x: auto; padding: 0 20px 15px; gap: 15px; scrollbar-width: none; }
+    .category-item { display: flex; flex-direction: column; align-items: center; min-width: 65px; gap: 8px; }
+    .category-icon { width: 55px; height: 55px; background-color: var(--primary-light); border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 28px; }
+    .category-item span { font-size: 12px; font-weight: 500; }
+
+    .restaurant-section { padding: 10px 20px; }
+    .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; }
+    
+    .restaurant-card { background-color: var(--white); border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; }
+    .restaurant-card:active { transform: scale(0.98); }
+    .res-image { width: 100%; height: 150px; background-size: cover; background-position: center; position: relative; }
+    .promo-tag { position: absolute; top: 10px; left: 0; background-color: var(--danger); color: var(--white); padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 0 12px 12px 0; }
+    .res-info { padding: 12px 15px; }
+    .res-name { font-size: 16px; font-weight: 600; margin: 0 0 5px; }
+    .res-meta { display: flex; align-items: center; font-size: 13px; color: var(--text-light); gap: 12px; margin-bottom: 8px; }
+    .rating { display: flex; align-items: center; color: var(--warning); font-weight: 600; }
+    .delivery-info { display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--primary-color); font-weight: 500; }
+
+    /* ---------------- หน้าร้านอาหารและเมนู (Menu Screen) ---------------- */
+    #menu-screen { display: none; background-color: var(--white); min-height: 100vh; }
+    .menu-header { position: relative; height: 200px; background-size: cover; background-position: center; }
+    .back-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.9); border-radius: 50%; padding: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .menu-shop-info { padding: 20px; border-bottom: 8px solid var(--bg-color); }
+    .menu-shop-info h2 { margin: 0 0 10px 0; font-size: 22px; }
+    
+    .menu-list { padding: 0 20px; }
+    .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; }
+    .menu-item-info h4 { margin: 0 0 5px 0; font-size: 16px; }
+    .menu-item-info p { margin: 0; color: var(--text-light); font-size: 14px; }
+    .add-btn { background-color: var(--primary-color); color: white; border: none; border-radius: 8px; padding: 8px 15px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; }
+    .add-btn:active { background-color: #009900; }
+
+    /* ---------------- แถบตะกร้าสินค้า (Cart Bar) ---------------- */
+    #cart-bar { display: none; position: fixed; bottom: 70px; left: 20px; right: 20px; background-color: var(--primary-color); color: white; padding: 15px 20px; border-radius: 12px; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(0,185,0,0.3); z-index: 101; cursor: pointer; }
+    .cart-info { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+    .cart-count { background: white; color: var(--primary-color); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+
+    /* ---------------- แถบเมนูด้านล่าง ---------------- */
+    .bottom-nav { position: fixed; bottom: 0; width: 100%; background-color: var(--white); display: flex; justify-content: space-around; padding: 12px 0 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 100; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; color: #b0b0b0; font-size: 10px; gap: 4px; cursor: pointer; }
+    .nav-item.active { color: var(--primary-color); }
+  </style>
 </head>
-<body class="bg-slate-200 flex justify-center text-slate-800">
+<body>
 
-    <div class="w-full max-w-md min-h-screen bg-slate-50 relative flex flex-col shadow-2xl overflow-hidden" id="app-root">
-
-        <!-- Login Screen -->
-        <div id="view-login" class="flex-1 flex flex-col items-center justify-center p-6 relative bg-white z-20">
-            <div class="w-24 h-24 bg-primary-100 text-primary-600 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-5xl shadow-inner shadow-primary-200 rotate-12">
-                <i class="fa-solid fa-jug-detergent -rotate-12"></i>
-            </div>
-            <h1 class="text-3xl font-bold text-slate-800 mb-2">Wash&Care</h1>
-            <p class="text-slate-500 mb-10 text-center text-sm">เช็กสถานะซักผ้าและรับสิทธิพิเศษ</p>
-            
-            <div class="w-full space-y-4">
-                <button onclick="simulateLineLogin()" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-4 rounded-2xl shadow-lg transition-all text-lg flex items-center justify-center active:scale-95">
-                    <i class="fa-brands fa-line text-2xl mr-3"></i> เข้าสู่ระบบด้วย LINE
-                </button>
-                <div class="relative flex items-center py-2">
-                    <div class="flex-grow border-t border-slate-200"></div><span class="mx-4 text-slate-400 text-xs">หรือใช้เบอร์โทรศัพท์</span><div class="flex-grow border-t border-slate-200"></div>
-                </div>
-                <div class="flex gap-2">
-                    <input type="tel" id="login-phone" placeholder="ระบุเบอร์โทร 08XXXXXXXX" class="flex-1 pl-4 pr-4 py-3.5 bg-slate-100 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none text-center font-bold text-lg tracking-wide">
-                    <button onclick="checkStatus()" id="btn-phone-login" class="bg-slate-800 text-white px-6 rounded-2xl active:scale-95"><i class="fa-solid fa-arrow-right"></i></button>
-                </div>
-            </div>
+  <!-- ================= หน้าแรก (Home Screen) ================= -->
+  <div id="home-screen">
+    <div class="header">
+      <div class="location-box">
+        <span class="material-icons pin">location_on</span>
+        <div class="location-text">
+          <span>จัดส่งที่</span>
+          <span>ชุมชนบ้านห้วยเกิ้ง <i class="material-icons" style="font-size: 16px;">keyboard_arrow_down</i></span>
         </div>
-
-        <!-- Register (LINE Link) -->
-        <div id="view-register" class="hidden flex-1 flex-col items-center justify-center p-6 bg-white z-30 absolute inset-0">
-            <h2 class="text-2xl font-bold text-slate-800 mb-2">ผูกบัญชีครั้งแรก</h2>
-            <p class="text-slate-500 text-sm text-center mb-8">กรุณายืนยันเบอร์โทรศัพท์</p>
-            <div class="mb-8 text-center relative">
-                <img id="reg-avatar" src="" class="w-28 h-28 rounded-full mx-auto mb-4 border-4 border-white shadow-lg object-cover">
-                <h3 id="reg-name" class="text-xl font-bold text-slate-800"></h3>
-                <p class="text-xs font-bold text-[#06C755] bg-green-50 inline-block px-3 py-1 rounded-full mt-2"><i class="fa-brands fa-line mr-1"></i>เชื่อมต่อ LINE แล้ว</p>
-            </div>
-            <input type="tel" id="reg-phone-input" placeholder="เบอร์โทรศัพท์ 10 หลัก" class="w-full text-center py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#06C755] outline-none font-bold text-lg mb-6 tracking-wide">
-            <button onclick="completeRegistration()" class="w-full bg-slate-800 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 mb-3">บันทึกข้อมูล</button>
-            <button onclick="cancelRegistration()" class="w-full text-slate-500 font-bold py-3 rounded-2xl">ยกเลิก</button>
-        </div>
-
-        <!-- Main App -->
-        <div id="view-main-app" class="hidden flex-1 flex-col h-full relative z-10">
-            
-            <header class="bg-white px-6 pt-8 pb-4 flex justify-between items-center shadow-sm sticky top-0 z-20">
-                <div class="flex items-center gap-3">
-                    <img id="app-avatar" src="" class="w-10 h-10 rounded-full object-cover border-2 border-primary-100">
-                    <div>
-                        <p class="text-xs text-slate-400 font-medium leading-none mb-1">สวัสดีครับ,</p>
-                        <h2 class="text-sm font-bold text-slate-800 leading-none" id="app-name">คุณลูกค้า</h2>
-                    </div>
-                </div>
-            </header>
-
-            <main class="flex-1 overflow-y-auto pb-24 bg-slate-50 hide-scroll">
-                
-                <!-- Tab Home -->
-                <div id="tab-home" class="tab-content active p-4 space-y-4">
-                    <div id="promo-banner" class="bg-gradient-to-r from-primary-500 to-blue-600 rounded-2xl p-4 text-white shadow-md flex items-center gap-3 hidden">
-                        <i class="fa-solid fa-bullhorn text-2xl text-yellow-300 animate-pulse"></i>
-                        <p class="text-sm font-medium" id="display-promo-text"></p>
-                    </div>
-
-                    <div id="unpaid-alert" class="hidden bg-gradient-to-r from-red-500 to-rose-600 p-5 rounded-3xl text-white shadow-lg shadow-red-500/20">
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-exclamation"></i> มียอดค้างชำระ</h3>
-                            <span class="text-2xl font-bold">฿<span id="unpaid-amount">0</span></span>
-                        </div>
-                        <p class="text-xs text-red-100 mb-4">กรุณาชำระเงินเพื่อรับผ้า</p>
-                        <button onclick="openModal('modal-promptpay')" class="w-full bg-white text-red-600 font-bold py-2.5 rounded-xl text-sm shadow-sm active:scale-95">สแกนจ่าย QR (PromptPay)</button>
-                    </div>
-
-                    <h3 class="font-bold text-slate-800 px-1 pt-2">รายการซักของคุณ</h3>
-                    <div id="active-orders" class="space-y-4"></div>
-                    <div id="empty-state" class="hidden bg-white p-8 rounded-3xl text-center my-6 shadow-sm">
-                        <i class="fa-solid fa-basket-shopping text-5xl text-slate-300 mb-4"></i>
-                        <h3 class="font-bold text-slate-700">ยังไม่มีรายการ</h3>
-                    </div>
-                </div>
-
-                <!-- Tab Services -->
-                <div id="tab-services" class="tab-content p-4 space-y-6">
-                    <div class="grid grid-cols-2 gap-3 mb-6">
-                        <a href="#" id="display-phone-link" class="bg-white p-4 rounded-3xl shadow-sm text-center flex flex-col items-center gap-2">
-                            <div class="w-12 h-12 rounded-full bg-green-50 text-green-600 flex items-center justify-center text-xl"><i class="fa-solid fa-phone"></i></div>
-                            <span class="text-sm font-bold text-slate-700">โทรติดต่อร้าน</span>
-                        </a>
-                        <a href="#" onclick="showToast('เปิดแอปนำทาง...')" class="bg-white p-4 rounded-3xl shadow-sm text-center flex flex-col items-center gap-2">
-                            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl"><i class="fa-solid fa-location-dot"></i></div>
-                            <span class="text-sm font-bold text-slate-700">แผนที่ร้าน</span>
-                        </a>
-                    </div>
-
-                    <h3 class="font-bold text-slate-800 px-1">อัตราค่าบริการมาตรฐาน</h3>
-                    <div class="bg-white rounded-3xl shadow-sm overflow-hidden border border-slate-100">
-                        <div class="p-4 border-b flex justify-between"><span class="font-bold text-slate-700"><i class="fa-solid fa-jug-detergent text-primary-500 mr-2"></i>ซัก + อบ</span><span class="font-bold" id="display-price-wash">฿60</span></div>
-                        <div class="p-4 border-b flex justify-between"><span class="font-bold text-slate-700"><i class="fa-solid fa-wind text-slate-400 mr-2"></i>อบแห้ง</span><span class="font-bold" id="display-price-dry">฿40</span></div>
-                        <div class="p-4 flex justify-between"><span class="font-bold text-slate-700"><i class="fa-solid fa-temperature-arrow-up text-orange-400 mr-2"></i>รีด (ต่อชิ้น)</span><span class="font-bold" id="display-price-iron">฿15</span></div>
-                    </div>
-                    
-                    <div class="bg-slate-100 rounded-2xl p-5 text-center mt-6">
-                        <p class="text-sm text-slate-500 font-bold mb-1">เวลาทำการ</p>
-                        <p class="text-slate-700" id="display-hours">-</p>
-                    </div>
-                </div>
-
-                <!-- Tab Profile -->
-                <div id="tab-profile" class="tab-content p-4 space-y-6">
-                    <div class="bg-primary-600 text-white p-6 rounded-3xl shadow-lg text-center">
-                        <p class="text-sm opacity-80 mb-1">แต้มสะสมของคุณ</p>
-                        <h3 class="text-4xl font-bold font-mono" id="profile-points">0</h3>
-                    </div>
-                    <h3 class="font-bold text-slate-800 px-1 mt-6">ประวัติซักรีด</h3>
-                    <div id="history-orders" class="bg-white rounded-3xl shadow-sm border border-slate-100 divide-y divide-slate-50"></div>
-                    <button onclick="logout()" class="w-full bg-red-50 text-red-600 font-bold py-4 rounded-2xl mt-8">ออกจากระบบ</button>
-                </div>
-            </main>
-
-            <!-- Bottom Nav -->
-            <nav class="glass-nav absolute bottom-0 w-full px-6 py-3 z-30 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase">
-                <button onclick="switchTab('tab-home')" id="nav-tab-home" class="nav-item flex flex-col items-center gap-1 w-16 text-primary-600"><i class="fa-solid fa-house text-xl"></i>หน้าแรก</button>
-                <button onclick="switchTab('tab-services')" id="nav-tab-services" class="nav-item flex flex-col items-center gap-1 w-16"><i class="fa-solid fa-shirt text-xl"></i>บริการ</button>
-                <button onclick="switchTab('tab-profile')" id="nav-tab-profile" class="nav-item flex flex-col items-center gap-1 w-16"><i class="fa-regular fa-user text-xl"></i>โปรไฟล์</button>
-            </nav>
-        </div>
-
-        <!-- Modal PromptPay -->
-        <div id="modal-promptpay" class="fixed inset-0 z-50 hidden flex-col items-center justify-center p-4">
-            <div class="absolute inset-0 bg-slate-900/60" onclick="closeModal('modal-promptpay')"></div>
-            <div class="bg-white rounded-[2rem] p-8 w-full max-w-xs relative z-10 text-center scale-95 transition" id="modal-promptpay-content">
-                <h3 class="text-lg font-bold text-[#113566] mb-4"><i class="fa-solid fa-qrcode text-3xl block mb-2"></i> สแกนพร้อมเพย์</h3>
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=PROMPTPAY-MOCKUP-0800000000&color=113566" class="w-48 h-48 mx-auto mix-blend-multiply rounded-xl mb-4" alt="QR">
-                <p class="text-xs text-slate-500">ยอดชำระสุทธิ</p>
-                <p class="text-3xl font-bold text-rose-600 mb-6">฿<span id="promptpay-amount">0</span></p>
-                <button onclick="closeModal('modal-promptpay')" class="w-full bg-slate-100 text-slate-600 font-bold py-3 rounded-2xl">ปิด</button>
-            </div>
-        </div>
-
-        <div id="toast-container" class="fixed top-4 left-0 right-0 flex flex-col items-center z-[100] pointer-events-none"></div>
+      </div>
     </div>
 
-    <script>
-        let currentUserPhone = '';
-        let mockLineProfile = null;
-        let updateInterval = null;
+    <div class="search-section">
+      <div class="search-bar">
+        <span class="material-icons" style="color: #999;">search</span>
+        <input type="text" placeholder="หิวอะไรดี? ค้นหาร้านอาหาร, เมนู...">
+      </div>
+    </div>
 
-        const statusConf = {
-            'pending': { label: 'รอซัก', icon: 'fa-clipboard-list', color: 'bg-yellow-500', bar: 'w-[20%] bg-yellow-500', text: 'text-yellow-600' },
-            'processing': { label: 'กำลังซัก', icon: 'fa-jug-detergent', color: 'bg-primary-500', bar: 'w-[50%] bg-primary-500', text: 'text-primary-600' },
-            'ready': { label: 'เสร็จสิ้น (รอรับ)', icon: 'fa-shirt', color: 'bg-green-500', bar: 'w-[90%] bg-green-500', text: 'text-green-600' }
-        };
+    <div class="banner-section">
+      <div class="banner">
+        <div style="z-index: 2;">
+          <h3>โค้ดลดพิเศษชุมชน</h3>
+          <p>ใส่โค้ด LOCAL50 ลดทันที 50 บาท!</p>
+        </div>
+        <div style="position: absolute; right: -20px; top: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.2); border-radius: 50%;"></div>
+      </div>
+    </div>
 
-        window.onload = function() {
-            loadStoreSettings();
-            const saved = localStorage.getItem('wash_customer_phone');
-            if (saved) { document.getElementById('login-phone').value = saved; checkStatus(saved); }
-        };
+    <div class="categories">
+      <div class="category-item"><div class="category-icon">🍛</div><span>ตามสั่ง</span></div>
+      <div class="category-item"><div class="category-icon">🍜</div><span>ก๋วยเตี๋ยว</span></div>
+      <div class="category-item"><div class="category-icon">☕</div><span>เครื่องดื่ม</span></div>
+      <div class="category-item"><div class="category-icon">🍰</div><span>ของหวาน</span></div>
+    </div>
 
-        function loadStoreSettings() {
-            let config = JSON.parse(localStorage.getItem('wash_store_config'));
-            if(config) {
-                document.getElementById('display-price-wash').innerText = '฿' + config.priceWash;
-                document.getElementById('display-price-dry').innerText = '฿' + config.priceDry;
-                document.getElementById('display-price-iron').innerText = '฿' + config.priceIron;
-                document.getElementById('display-hours').innerText = config.hours;
-                document.getElementById('display-phone-link').href = 'tel:' + config.phone.replace(/-/g, '');
-                
-                const promoBox = document.getElementById('promo-banner');
-                if(config.promo && config.promo.trim() !== '') {
-                    document.getElementById('display-promo-text').innerText = config.promo;
-                    promoBox.classList.remove('hidden');
-                } else { promoBox.classList.add('hidden'); }
-            }
-        }
+    <div class="restaurant-section">
+      <div class="section-title">ร้านยอดฮิตแถวบ้านคุณ</div>
+      <div id="restaurant-list"></div>
+    </div>
+  </div>
 
-        function switchTab(id) {
-            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(e => { e.classList.remove('text-primary-600'); e.classList.add('text-slate-400'); });
-            document.getElementById(id).classList.add('active');
-            document.getElementById('nav-' + id).classList.remove('text-slate-400');
-            document.getElementById('nav-' + id).classList.add('text-primary-600');
-        }
+  <!-- ================= หน้าร้านอาหารและเมนู (Menu Screen) ================= -->
+  <div id="menu-screen">
+    <div class="menu-header" id="menu-image">
+      <div class="back-btn" onclick="closeRestaurant()">
+        <span class="material-icons">arrow_back</span>
+      </div>
+    </div>
+    <div class="menu-shop-info">
+      <h2 id="menu-name">ชื่อร้าน</h2>
+      <div class="res-meta">
+        <span class="rating"><i class="material-icons" style="font-size:16px;">star</i> <span id="menu-rating">4.5</span></span>
+        <span>ระยะทาง <span id="menu-distance">1 กม.</span></span>
+      </div>
+    </div>
+    
+    <div class="menu-list">
+      <h3 style="margin-top: 20px;">เมนูอาหาร</h3>
+      <div id="food-list">
+        <!-- เมนูจะถูกดึงมาแสดงที่นี่ -->
+      </div>
+    </div>
+  </div>
 
-        function simulateLineLogin() {
-            const id = Math.floor(Math.random() * 99);
-            mockLineProfile = { name: "ลูกค้าซักผ้า_" + id, avatar: `https://i.pravatar.cc/150?img=${id}`, lineLinked: true };
-            document.getElementById('view-login').classList.add('hidden');
-            document.getElementById('view-register').classList.remove('hidden');
-            document.getElementById('view-register').classList.add('flex');
-            document.getElementById('reg-avatar').src = mockLineProfile.avatar;
-            document.getElementById('reg-name').innerText = mockLineProfile.name;
-        }
+  <!-- ================= แถบตะกร้าสินค้า (Cart Bar) ================= -->
+  <div id="cart-bar" onclick="checkout()">
+    <div class="cart-info">
+      <div class="cart-count" id="cart-count">1</div>
+      <span>ดูตะกร้าของคุณ</span>
+    </div>
+    <div style="font-weight: 600;">
+      ฿<span id="cart-total">0</span>
+    </div>
+  </div>
 
-        function completeRegistration() {
-            const phone = document.getElementById('reg-phone-input').value.trim();
-            if(phone.length < 9) return showToast("ใส่เบอร์ให้ถูกต้อง", "error");
-            
-            let customers = JSON.parse(localStorage.getItem('wash_customers')) || [];
-            let exist = customers.find(c => c.phone === phone);
-            
-            if(exist) {
-                exist.avatar = mockLineProfile.avatar; exist.lineLinked = true;
-                if(!exist.name || exist.name==='ลูกค้าทั่วไป') exist.name = mockLineProfile.name;
-            } else {
-                customers.push({ phone, name: mockLineProfile.name, points: 0, avatar: mockLineProfile.avatar, lineLinked: true });
-            }
-            localStorage.setItem('wash_customers', JSON.stringify(customers));
-            
-            document.getElementById('view-register').classList.add('hidden');
-            document.getElementById('view-register').classList.remove('flex');
-            document.getElementById('view-login').classList.remove('hidden');
-            document.getElementById('login-phone').value = phone;
-            checkStatus(phone);
-        }
-        function cancelRegistration() { location.reload(); }
+  <!-- ================= แถบเมนูด้านล่าง ================= -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="closeRestaurant()"><span class="material-icons">storefront</span><span>หน้าแรก</span></div>
+    <div class="nav-item"><span class="material-icons">local_offer</span><span>โปรโมชัน</span></div>
+    <div class="nav-item"><span class="material-icons">receipt_long</span><span>ออเดอร์</span></div>
+    <div class="nav-item"><span class="material-icons">person</span><span>ฉัน</span></div>
+  </div>
 
-        function checkStatus(forcePhone = null) {
-            const phone = forcePhone || document.getElementById('login-phone').value.trim();
-            if (phone.length < 9) return showToast("ใส่เบอร์ 10 หลัก", "error");
+  <script>
+    // 1. จำลองฐานข้อมูลร้านค้าและเมนูอาหาร
+    const restaurants = [
+      {
+        id: 1,
+        name: "ป้าแจ๋ว อาหารตามสั่ง",
+        image: "https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=500&q=80",
+        rating: "4.8", distance: "1.2 กม.", promo: "ส่งฟรี", time: "15-25 นาที",
+        menus: [
+          { name: "ข้าวกะเพราหมูสับ+ไข่ดาว", price: 50 },
+          { name: "ข้าวผัดกุ้ง", price: 60 },
+          { name: "สุกี้น้ำรวมมิตร", price: 55 }
+        ]
+      },
+      {
+        id: 2,
+        name: "ก๋วยเตี๋ยวเรือ เจ๊นก",
+        image: "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?auto=format&fit=crop&w=500&q=80",
+        rating: "4.5", distance: "2.5 กม.", promo: "ลด 10%", time: "20-30 นาที",
+        menus: [
+          { name: "ก๋วยเตี๋ยวเรือน้ำตกหมู", price: 40 },
+          { name: "เกาเหลาเนื้อตุ๋น", price: 60 },
+          { name: "กากหมูเจียว", price: 20 }
+        ]
+      }
+    ];
 
-            let customers = JSON.parse(localStorage.getItem('wash_customers')) || [];
-            let orders = JSON.parse(localStorage.getItem('wash_orders')) || [];
-            let cust = customers.find(c => c.phone === phone);
-            let myOrders = orders.filter(o => o.phone === phone).sort((a,b) => new Date(b.date) - new Date(a.date));
+    let cartTotal = 0;
+    let cartItemsCount = 0;
 
-            if (myOrders.length === 0 && !cust) return showToast("ไม่พบข้อมูลเบอร์นี้ กรุณาสมัคร LINE", "error");
+    // 2. สร้างหน้าแรก (ดึงรายการร้านมาแสดง)
+    window.onload = function() {
+      const listContainer = document.getElementById('restaurant-list');
+      restaurants.forEach((res, index) => {
+        const card = `
+          <div class="restaurant-card" onclick="openRestaurant(${index})">
+            <div class="res-image" style="background-image: url('${res.image}')">
+              ${res.promo ? `<div class="promo-tag">${res.promo}</div>` : ''}
+            </div>
+            <div class="res-info">
+              <h3 class="res-name">${res.name}</h3>
+              <div class="res-meta">
+                <span class="rating"><i class="material-icons" style="font-size:14px">star</i> ${res.rating}</span>
+                <span>• ${res.distance}</span>
+              </div>
+              <div class="delivery-info"><i class="material-icons">moped</i><span>จัดส่งใน ${res.time}</span></div>
+            </div>
+          </div>
+        `;
+        listContainer.innerHTML += card;
+      });
+    };
 
-            currentUserPhone = phone;
-            localStorage.setItem('wash_customer_phone', phone);
-            
-            document.getElementById('view-login').classList.add('hidden');
-            document.getElementById('view-main-app').classList.remove('hidden');
-            document.getElementById('view-main-app').classList.add('flex');
-            
-            renderApp(cust, myOrders);
-            if(updateInterval) clearInterval(updateInterval);
-            updateInterval = setInterval(() => { refreshDataSilently(); }, 3000);
-        }
+    // 3. ฟังก์ชันเปิดหน้าร้านอาหาร
+    function openRestaurant(index) {
+      const res = restaurants[index];
+      
+      // สลับหน้าจอ
+      document.getElementById('home-screen').style.display = 'none';
+      document.getElementById('menu-screen').style.display = 'block';
+      window.scrollTo(0, 0);
 
-        function refreshDataSilently() {
-            if (!currentUserPhone) return;
-            loadStoreSettings();
-            let cust = (JSON.parse(localStorage.getItem('wash_customers')) || []).find(c => c.phone === currentUserPhone);
-            let ord = (JSON.parse(localStorage.getItem('wash_orders')) || []).filter(o => o.phone === currentUserPhone).sort((a,b) => new Date(b.date) - new Date(a.date));
-            renderApp(cust, ord);
-        }
+      // ใส่ข้อมูลร้าน
+      document.getElementById('menu-image').style.backgroundImage = `url('${res.image}')`;
+      document.getElementById('menu-name').innerText = res.name;
+      document.getElementById('menu-rating').innerText = res.rating;
+      document.getElementById('menu-distance').innerText = res.distance;
 
-        function logout() { localStorage.removeItem('wash_customer_phone'); location.reload(); }
+      // สร้างรายการเมนู
+      const foodList = document.getElementById('food-list');
+      foodList.innerHTML = '';
+      res.menus.forEach(menu => {
+        foodList.innerHTML += `
+          <div class="menu-item">
+            <div class="menu-item-info">
+              <h4>${menu.name}</h4>
+              <p>฿${menu.price}</p>
+            </div>
+            <button class="add-btn" onclick="addToCart(${menu.price})">เพิ่ม</button>
+          </div>
+        `;
+      });
+    }
 
-        function renderApp(cust, orders) {
-            let name = cust && cust.name ? cust.name : 'ลูกค้า';
-            let pts = cust ? cust.points : 0;
-            let avatar = cust && cust.avatar ? cust.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=f0f9ff&color=0ea5e9`;
-            
-            document.getElementById('app-name').innerText = name;
-            document.getElementById('app-avatar').src = avatar;
-            document.getElementById('profile-points').innerText = pts;
+    // 4. ฟังก์ชันปิดหน้าร้านอาหาร (กลับหน้าแรก)
+    function closeRestaurant() {
+      document.getElementById('home-screen').style.display = 'block';
+      document.getElementById('menu-screen').style.display = 'none';
+    }
 
-            const active = orders.filter(o => o.status !== 'completed');
-            const history = orders.filter(o => o.status === 'completed').slice(0, 10);
+    // 5. ฟังก์ชันเพิ่มลงตะกร้า
+    function addToCart(price) {
+      cartItemsCount++;
+      cartTotal += price;
+      
+      document.getElementById('cart-count').innerText = cartItemsCount;
+      document.getElementById('cart-total').innerText = cartTotal;
+      document.getElementById('cart-bar').style.display = 'flex'; // แสดงแถบตะกร้า
+    }
 
-            const unpaidAmount = active.reduce((sum, o) => sum + (o.isPaid ? 0 : o.total), 0);
-            const alertBox = document.getElementById('unpaid-alert');
-            if (unpaidAmount > 0) {
-                document.getElementById('unpaid-amount').innerText = unpaidAmount.toLocaleString();
-                document.getElementById('promptpay-amount').innerText = unpaidAmount.toLocaleString();
-                alertBox.classList.remove('hidden');
-            } else { alertBox.classList.add('hidden'); }
-
-            const aCont = document.getElementById('active-orders');
-            if (active.length === 0) {
-                aCont.innerHTML = ''; document.getElementById('empty-state').classList.remove('hidden');
-            } else {
-                document.getElementById('empty-state').classList.add('hidden');
-                aCont.innerHTML = active.map(o => {
-                    const c = statusConf[o.status];
-                    return `
-                    <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 relative">
-                        <div class="flex justify-between items-start mb-4">
-                            <div><p class="text-xs text-slate-400 mb-1 font-mono">ORD: ${o.id}</p><h4 class="font-bold text-lg">${o.serviceName}</h4></div>
-                            <div class="w-12 h-12 rounded-2xl ${c.color} text-white flex items-center justify-center text-xl shadow-md rotate-3"><i class="fa-solid ${c.icon} -rotate-3"></i></div>
-                        </div>
-                        <div class="mt-6">
-                            <div class="flex justify-between items-end mb-2">
-                                <span class="text-sm font-bold ${c.text}">${c.label}</span>
-                                ${o.rack ? `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-location-dot"></i> ล็อก: ${o.rack}</span>` : ''}
-                            </div>
-                            <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden"><div class="h-full rounded-full transition-all duration-1000 ${c.bar}"></div></div>
-                        </div>
-                    </div>`;
-                }).join('');
-            }
-
-            const hCont = document.getElementById('history-orders');
-            hCont.innerHTML = history.length === 0 ? '<div class="p-8 text-center text-slate-400 text-sm">ยังไม่มีประวัติ</div>' : history.map(o => `
-                <div class="p-4 flex justify-between items-center bg-white">
-                    <div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-receipt"></i></div>
-                    <div><p class="font-bold text-slate-700 text-sm">${o.serviceName}</p><p class="text-xs text-slate-400 mt-0.5">${new Date(o.date).toLocaleDateString('th-TH')}</p></div></div>
-                    <div class="text-right"><p class="font-bold text-slate-700 text-sm">฿${o.total.toLocaleString()}</p></div>
-                </div>`).join('');
-        }
-
-        function showToast(msg, type='success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `${type==='success'?'bg-slate-800':'bg-red-500'} text-white px-4 py-3 rounded-full shadow-lg text-sm font-medium mt-2`;
-            toast.innerText = msg;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 2500);
-        }
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); setTimeout(()=>document.getElementById(id+'-content').classList.remove('scale-95'),10); }
-        function closeModal(id) { document.getElementById(id+'-content').classList.add('scale-95'); setTimeout(()=> {document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex');}, 150); }
-    </script>
+    // 6. ฟังก์ชันจำลองการกดสั่งซื้อ
+    function checkout() {
+      alert(`คุณได้ทำการสั่งอาหารจำนวน ${cartItemsCount} รายการ\nยอดรวมทั้งหมด ฿${cartTotal}\n\nระบบจำลองการรับออเดอร์สำเร็จ! ไรเดอร์กำลังเตรียมจัดส่งไปที่ชุมชนบ้านห้วยเกิ้งครับ`);
+      
+      // รีเซ็ตตะกร้า
+      cartItemsCount = 0;
+      cartTotal = 0;
+      document.getElementById('cart-bar').style.display = 'none';
+      closeRestaurant(); // กลับหน้าหลัก
+    }
+  </script>
 </body>
 </html>
